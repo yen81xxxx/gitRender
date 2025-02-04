@@ -1,31 +1,28 @@
 const express = require('express');
 const cors = require('cors');
-const { Client } = require('pg');  // 引入 PostgreSQL 客戶端
+const { Client } = require('pg');
+const path = require('path');  // 引入 path 模組
 const app = express();
+
 app.use(cors());
 app.use(express.json());
-
-
-// 這裡設定靜態資源，讓 Express 服務 public 資料夾中的檔案
-const path = require('path');  // 引入 path 模組
-app.use(express.static(path.join(__dirname, 'public')));
 
 // 連接 PostgreSQL 資料庫
 const client = new Client({
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false } // Render 可能需要開啟 SSL
+    ssl: { rejectUnauthorized: false }
 });
-client.connect();  // 連接到資料庫
+client.connect();
 
 // 取得事件資料的 API
 app.get('/events', (req, res) => {
-    const query = 'SELECT * FROM events';  // SQL 查詢語句
+    const query = 'SELECT * FROM events';
     client.query(query, (err, result) => {
         if (err) {
             console.error('Error executing query', err.stack);
             return res.status(500).send('Error fetching events');
         }
-        res.json(result.rows);  // 返回查詢到的所有事件資料
+        res.json(result.rows);
     });
 });
 
@@ -40,11 +37,11 @@ app.post('/events', (req, res) => {
             console.error('Error inserting event', err.stack);
             return res.status(500).send('Error saving event');
         }
-        res.json({ id: result.rows[0].id });  // 返回新增事件的 ID
+        res.json({ id: result.rows[0].id });
     });
 });
 
-// 修改事件的 API (更新)
+// 修改事件的 API
 app.put('/events/:id', (req, res) => {
     const eventId = req.params.id;
     const { InputContent, InputStartDate, InputEndDate, InputColor } = req.body;
@@ -82,8 +79,11 @@ app.delete('/events/:id', (req, res) => {
     });
 });
 
+// 設定靜態檔案路徑
+app.use(express.static(path.join(__dirname, 'public')));
+
 // 啟動伺服器
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
