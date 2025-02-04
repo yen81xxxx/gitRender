@@ -4,6 +4,9 @@ const { Client } = require('pg');
 const path = require('path');  // 引入 path 模組
 const app = express();
 
+console.log("啟動!!");
+
+
 app.use(cors());
 app.use(express.json());
 
