@@ -80,7 +80,11 @@ app.delete('/events/:id', (req, res) => {
 });
 
 // 設定靜態檔案路徑
+const path = require('path');
 app.use(express.static(path.join(__dirname, 'public')));
+
+// 新增 log 來檢查 public 資料夾的位置
+console.log("Public folder is being served from:", path.join(__dirname, 'public'));
 
 // 啟動伺服器
 const PORT = process.env.PORT || 3000;
