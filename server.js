@@ -7,6 +7,7 @@ app.use(express.json());
 
 
 // 這裡設定靜態資源，讓 Express 服務 public 資料夾中的檔案
+const path = require('path');  // 引入 path 模組
 app.use(express.static(path.join(__dirname, 'public')));
 
 // 連接 PostgreSQL 資料庫
