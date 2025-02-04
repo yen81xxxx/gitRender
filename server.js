@@ -7,11 +7,8 @@ app.use(express.json());
 
 // 連接 PostgreSQL 資料庫
 const client = new Client({
-    host: 'your-database-host',  // PostgreSQL 資料庫的主機名稱（例如，Heroku 或 AWS 提供的端點）
-    port: 5432,                  // 通常 PostgreSQL 預設的端口是 5432
-    user: 'your-database-user',  // 資料庫的使用者名稱
-    password: 'your-database-password',  // 資料庫的密碼
-    database: 'your-database-name',  // 資料庫名稱
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false } // Render 可能需要開啟 SSL
 });
 client.connect();  // 連接到資料庫
 
@@ -81,6 +78,7 @@ app.delete('/events/:id', (req, res) => {
 });
 
 // 啟動伺服器
-app.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
 });
