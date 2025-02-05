@@ -3,7 +3,6 @@ console.log("伺服器正在啟動...");
 const express = require('express');
 const cors = require('cors');
 const { Client } = require('pg');
-const path = require('path');  // 引入 path 模組
 const app = express();
 
 console.log("啟動!!");
