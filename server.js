@@ -1,3 +1,5 @@
+console.log("伺服器正在啟動...");
+
 const express = require('express');
 const cors = require('cors');
 const { Client } = require('pg');
