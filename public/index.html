@@ -32,7 +32,8 @@
                     right: ''
                 },
                 events: function(info, successCallback, failureCallback) {
-                    fetch('http://localhost:3000/events')
+                    //fetch('http://localhost:3000/events')
+                    fetch('/events')
                         .then(response => response.json())
                         .then(data => {
                             console.log('從伺服器接收到的資料:', data);
