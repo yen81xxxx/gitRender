@@ -85,7 +85,8 @@
                         preConfirm: function (eventContent) {
                             const color = document.querySelector('input[name="color"]:checked').value; // 取得選擇的顏色
                             if (eventContent) {
-                                return fetch('http://localhost:3000/events', {
+                                //return fetch('http://localhost:3000/events', {
+                                return fetch('/events', {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json'
@@ -150,7 +151,8 @@
                             // 刪除本地事件
                             info.event.remove();
                             // 刪除伺服器上的事件
-                            fetch(`http://localhost:3000/events/${info.event.id}`, {
+                            //fetch(`http://localhost:3000/events/${info.event.id}`, {
+                            fetch(`/events/${info.event.id}`, {
                                 method: 'DELETE',
                             })
                             .then(response => {
