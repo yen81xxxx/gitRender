@@ -38,8 +38,8 @@
                         console.log('📌 從後端獲取的原始資料:', data);
                         const events = data.map(event => ({
                             title: event.title,
-                            start: event.start,
-                            end: event.end,
+                            start: event.startdate.split('T')[0], // 轉換為 YYYY-MM-DD
+                            end: event.enddate.split('T')[0],   // 轉換為 YYYY-MM-DD
                             color: event.color,
                             allDay: true,
                              id: event.id.toString(),  // 確保 id 是 string
