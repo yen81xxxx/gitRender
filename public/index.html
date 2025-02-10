@@ -15,6 +15,13 @@
             max-width: 900px;
             margin: 50px auto;
         }
+         /* 這段 CSS 確保在手機上的顯示能自適應 */
+        @media only screen and (max-width: 768px) {
+            #calendar {
+                width: 100% !important;
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -118,6 +125,8 @@
                     });
                 },
                 eventClick: function (info) {
+                     console.log("Event Clicked: ", info);  // 這行確保事件被觸發
+                    
                     const startDate = new Date(info.event.startStr); // 確保 startDate 是 Date 物件
                     let endDate = new Date(info.event.endStr); // 確保 endDate 是 Date 物件
                     
@@ -161,6 +170,10 @@
             });
 
             calendar.render();
+             // 手機端觸控事件測試
+            calendarEl.addEventListener('touchstart', function(event) {
+                console.log("Touch event triggered!");  // 可以檢查觸控事件是否觸發
+            });
         });
 
     </script>
