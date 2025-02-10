@@ -118,16 +118,18 @@
                     });
                 },
                 eventClick: function (info) {
-                    let endDate = new Date(info.event.endStr);
-    
-                    // 修正結束日期
-                    const correctedEndDate = endDate === startDate ? endDate : new Date(endDate.getTime() - 1000 * 60 * 60 * 24);
+                    const startDate = new Date(info.event.startStr); // 確保 startDate 是 Date 物件
+                    let endDate = new Date(info.event.endStr); // 確保 endDate 是 Date 物件
+                    
+                    // 修正結束時間，將結束時間減去一天，避免多顯示一天
+                    const correctedEndDate = endDate.getTime() === startDate.getTime() ? endDate : new Date(endDate.getTime() - 1000 * 60 * 60 * 24);
 
                     Swal.fire({
                         title: '詳細資訊',
                         html: `
                             <p>${info.event.title}</p>
-                            <p><strong>開始日期：</strong>${info.event.startStr}</p>
+                            //<p><strong>開始日期：</strong>${info.event.startStr}</p>
+                            <p><strong>開始日期：</strong>${startDate.toISOString().split('T')[0]}</p>
                             <p><strong>結束日期：</strong>${correctedEndDate.toISOString().split('T')[0]}</p>
                         `,
                         icon: 'info',
