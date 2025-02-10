@@ -37,12 +37,12 @@
                     .then(data => {
                         console.log('📌 從後端獲取的原始資料:', data);
                         const events = data.map(event => ({
-                            title: event.content,
-                            start: event.startDate,
-                            end: event.endDate,
+                            title: event.title,
+                            start: event.start,
+                            end: event.end,
                             color: event.color,
                             allDay: true,
-                            id: event.id
+                             id: event.id.toString(),  // 確保 id 是 string
                         }));
                         successCallback(events);  // FullCalendar 只需要這個來接收事件
                     })
