@@ -37,7 +37,7 @@
                     .then(data => {
                         console.log('📌 從後端獲取的原始資料:', data);
                         const events = data.map(event => ({
-                            title: event.title,
+                            title: event.content ,
                             start: event.startdate.split('T')[0], // 轉換為 YYYY-MM-DD
                             end: event.enddate.split('T')[0],   // 轉換為 YYYY-MM-DD
                             color: event.color,
