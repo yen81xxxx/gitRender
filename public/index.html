@@ -9,9 +9,11 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         #calendar {
-            max-width: 900px;
-            margin: 40px auto;
-        }
+    max-width: 100%;
+    margin: 40px auto;
+    min-height: 500px;  /* 設置一個最小高度來避免被切割 */
+    height: auto; /* 自動調整高度 */
+}
     </style>
 </head>
 <body>
@@ -22,6 +24,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             const calendarEl = document.getElementById('calendar');
             const calendar = new FullCalendar.Calendar(calendarEl, {
+                aspectRatio: 1.5,  // 調整顯示比例，可以適應更多內容
                 initialView: 'dayGridMonth',
                 headerToolbar: {
                     left: 'prev,next today',
