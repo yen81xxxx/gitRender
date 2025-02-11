@@ -1,143 +1,166 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const calendarEl = document.getElementById('calendar');
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: ''
-        },
-        selectable: true,
-        unselectAuto: false, // 🔥 確保點擊事件後仍可選取日期
-        select: function (info) {
-            console.log('📌 Select event triggered', info); // 🔍 Debug: 確保有觸發
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FullCalendar 測試</title>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        #calendar {
+            max-width: 900px;
+            margin: 40px auto;
+        }
+    </style>
+</head>
+<body>
 
-            const startDate = info.startStr;
-            let endDate = new Date(info.endStr);
+    <div id="calendar"></div>
 
-            // 🔥 修正 `endDate` 計算，確保 `start` 和 `end` 不會變成同一天
-            const adjustedEndDate = new Date(endDate.getTime() - 1000 * 60 * 60 * 24).toISOString().split('T')[0];
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: ''
+                },
+                selectable: true,
+                unselectAuto: false,
+                select: function (info) {
+                    console.log('📌 選取事件觸發:', info);
 
-            Swal.fire({
-                title: '新增活動',
-                html: `您選擇的範圍：<br><strong>${startDate}</strong> 到 <strong>${adjustedEndDate}</strong>
-                <br>
-                <label>請選擇顏色：</label><br>
-                <input type="radio" id="red" name="color" value="#FFA500" checked>
-                <label for="red">橘色</label><br>
-                <input type="radio" id="green" name="color" value="#98FF98">
-                <label for="green">綠色</label><br>
-                <input type="radio" id="blue" name="color" value="#89CFF0">
-                <label for="blue">藍色</label><br>
-                `,
-                input: 'text',
-                inputPlaceholder: '請輸入活動內容',
-                showCancelButton: true,
-                confirmButtonText: '確定',
-                cancelButtonText: '取消',
-                preConfirm: function (eventContent) {
-                    const color = document.querySelector('input[name="color"]:checked').value;
-                    if (eventContent) {
-                        return fetch('/events', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                InputContent: eventContent,
-                                InputStartDate: startDate,
-                                InputEndDate: adjustedEndDate,
-                                InputColor: color
-                            })
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('儲存事件失敗');
+                    const startDate = info.startStr;
+                    let endDate = new Date(info.endStr);
+                    const adjustedEndDate = new Date(endDate.getTime() - 1000 * 60 * 60 * 24).toISOString().split('T')[0];
+
+                    Swal.fire({
+                        title: '新增活動',
+                        html: `您選擇的範圍：<br><strong>${startDate}</strong> 到 <strong>${adjustedEndDate}</strong>
+                        <br>
+                        <label>請選擇顏色：</label><br>
+                        <input type="radio" id="red" name="color" value="#FFA500" checked>
+                        <label for="red">橘色</label><br>
+                        <input type="radio" id="green" name="color" value="#98FF98">
+                        <label for="green">綠色</label><br>
+                        <input type="radio" id="blue" name="color" value="#89CFF0">
+                        <label for="blue">藍色</label><br>
+                        `,
+                        input: 'text',
+                        inputPlaceholder: '請輸入活動內容',
+                        showCancelButton: true,
+                        confirmButtonText: '確定',
+                        cancelButtonText: '取消',
+                        preConfirm: function (eventContent) {
+                            const color = document.querySelector('input[name="color"]:checked').value;
+                            if (eventContent) {
+                                return fetch('/events', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        InputContent: eventContent,
+                                        InputStartDate: startDate,
+                                        InputEndDate: adjustedEndDate,
+                                        InputColor: color
+                                    })
+                                })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('儲存事件失敗');
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    console.log('✅ 活動儲存成功:', data);
+                                    calendar.refetchEvents();
+                                    return eventContent;
+                                })
+                                .catch(error => {
+                                    console.error('❌ 儲存事件錯誤:', error);
+                                    Swal.fire('錯誤', '儲存事件失敗，請稍後再試！', 'error');
+                                    return false;
+                                });
+                            } else {
+                                Swal.showValidationMessage('請輸入事件標題！');
+                                return false;
                             }
-                            return response.json();
-                        })
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire('活動已新增', `內容為: ${result.value}`, 'success');
+                        }
+                    });
+                },
+                events: function(info, successCallback, failureCallback) {
+                    fetch('/events')
+                        .then(response => response.json())
                         .then(data => {
-                            console.log('✅ 活動儲存成功:', data);
-                            calendar.refetchEvents(); // 🔥 確保新增活動後重新整理
-                            return eventContent;
+                            console.log('📌 取得事件:', data);
+                            const events = data.map(event => ({
+                                title: event.content,
+                                start: event.startdate.split('T')[0],
+                                end: new Date(new Date(event.enddate).getTime() + 1000 * 60 * 60 * 24).toISOString().split('T')[0],
+                                color: event.color,
+                                allDay: true,
+                                id: event.id.toString(),
+                            }));
+                            successCallback(events);
                         })
                         .catch(error => {
-                            console.error('❌ 儲存事件錯誤:', error);
-                            Swal.fire('錯誤', '儲存事件失敗，請稍後再試！', 'error');
-                            return false;
+                            console.error('❌ 讀取事件錯誤:', error);
+                            failureCallback(error);
                         });
-                    } else {
-                        Swal.showValidationMessage('請輸入事件標題！');
-                        return false;
-                    }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire('活動已新增', `內容為: ${result.value}`, 'success');
-                }
-            });
-        },
-        events: function(info, successCallback, failureCallback) {
-            fetch('/events')
-                .then(response => response.json())
-                .then(data => {
-                    console.log('📌 從後端獲取的原始資料:', data);
-                    const events = data.map(event => ({
-                        title: event.content,
-                        start: event.startdate.split('T')[0],
-                        end: new Date(new Date(event.enddate).getTime() + 1000 * 60 * 60 * 24).toISOString().split('T')[0], // 🔥 修正 end date
-                        color: event.color,
-                        allDay: true,
-                        id: event.id.toString(),
-                    }));
-                    successCallback(events);
-                })
-                .catch(error => {
-                    console.error('❌ 讀取事件時發生錯誤:', error);
-                    failureCallback(error);
-                });
-        },
-        eventClick: function (info) {
-            console.log("📌 Event Clicked: ", info);
-            const startDate = new Date(info.event.startStr);
-            let endDate = new Date(info.event.endStr);
-            const correctedEndDate = new Date(endDate.getTime() - 1000 * 60 * 60 * 24);
+                },
+                eventClick: function (info) {
+                    console.log("📌 點擊事件: ", info);
+                    const startDate = new Date(info.event.startStr);
+                    let endDate = new Date(info.event.endStr);
+                    const correctedEndDate = new Date(endDate.getTime() - 1000 * 60 * 60 * 24);
 
-            Swal.fire({
-                title: '詳細資訊',
-                html: `
-                    <p>${info.event.title}</p>
-                    <p><strong>開始日期：</strong>${startDate.toISOString().split('T')[0]}</p>
-                    <p><strong>結束日期：</strong>${correctedEndDate.toISOString().split('T')[0]}</p>
-                `,
-                icon: 'info',
-                confirmButtonText: '確定',
-                showCancelButton: true,
-                cancelButtonText: '刪除活動'
-            }).then((result) => {
-                if (result.isDismissed) {
-                    info.event.remove();
-                    fetch(`/events/${info.event.id}`, {
-                        method: 'DELETE',
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('刪除事件失敗');
+                    Swal.fire({
+                        title: '詳細資訊',
+                        html: `
+                            <p>${info.event.title}</p>
+                            <p><strong>開始日期：</strong>${startDate.toISOString().split('T')[0]}</p>
+                            <p><strong>結束日期：</strong>${correctedEndDate.toISOString().split('T')[0]}</p>
+                        `,
+                        icon: 'info',
+                        confirmButtonText: '確定',
+                        showCancelButton: true,
+                        cancelButtonText: '刪除活動'
+                    }).then((result) => {
+                        if (result.isDismissed) {
+                            info.event.remove();
+                            fetch(`/events/${info.event.id}`, {
+                                method: 'DELETE',
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('刪除事件失敗');
+                                }
+                                return response.json();
+                            })
+                            .then(() => {
+                                Swal.fire('活動已刪除', '', 'success');
+                                calendar.refetchEvents();
+                            })
+                            .catch(error => {
+                                console.error('❌ 刪除事件錯誤:', error);
+                                Swal.fire('錯誤', '刪除事件失敗，請稍後再試！', 'error');
+                            });
                         }
-                        return response.json();
-                    })
-                    .then(() => {
-                        Swal.fire('活動已刪除', '', 'success');
-                        calendar.refetchEvents();
-                    })
-                    .catch(error => {
-                        console.error('❌ 刪除事件錯誤:', error);
-                        Swal.fire('錯誤', '刪除事件失敗，請稍後再試！', 'error');
                     });
                 }
             });
-        }
-    });
 
-    calendar.render();
-});
+            calendar.render();
+        });
+    </script>
+
+</body>
+</html>
