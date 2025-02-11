@@ -44,11 +44,11 @@
                         <br>
                         <label>請選擇顏色：</label><br>
                         <input type="radio" id="red" name="color" value="#FFA500" checked>
-                        <label for="red">橘色</label><br>
+                        <label for="red">橘色(爸媽)</label><br>
                         <input type="radio" id="green" name="color" value="#98FF98">
-                        <label for="green">綠色</label><br>
+                        <label for="green">綠色(彥)</label><br>
                         <input type="radio" id="blue" name="color" value="#89CFF0">
-                        <label for="blue">藍色</label><br>
+                        <label for="blue">藍色(柏朵)</label><br>
                         `,
                         input: 'text',
                         inputPlaceholder: '請輸入活動內容',
@@ -124,14 +124,14 @@
                     const correctedEndDate = new Date(endDate.getTime() - 1000 * 60 * 60 * 24);
 
                     Swal.fire({
-                        title: '詳細資訊',
+                        title: '詳細內容',
                         html: `
                             <p>${info.event.title}</p>
                             <p><strong>開始日期：</strong>${startDate.toISOString().split('T')[0]}</p>
                             <p><strong>結束日期：</strong>${correctedEndDate.toISOString().split('T')[0]}</p>
                         `,
                         icon: 'info',
-                        confirmButtonText: '確定',
+                        confirmButtonText: '返回',
                         showCancelButton: true,
                         cancelButtonText: '刪除活動'
                     }).then((result) => {
