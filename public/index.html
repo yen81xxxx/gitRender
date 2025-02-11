@@ -29,6 +29,7 @@
                     right: ''
                 },
                 selectable: true,
+                longPressDelay: 0,
                 unselectAuto: false,
                 select: function (info) {
                     console.log('📌 選取事件觸發:', info);
@@ -159,6 +160,10 @@
             });
 
             calendar.render();
+             // ✅ 測試手機是否能偵測點擊
+            document.addEventListener("click", function(event) {
+                console.log("📱 點擊事件:", event.target);
+            });
         });
     </script>
 
