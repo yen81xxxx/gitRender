@@ -46,7 +46,8 @@
                         const events = data.map(event => ({
                             title: event.content ,
                             start: event.startdate.split('T')[0], // 轉換為 YYYY-MM-DD
-                            end: event.enddate.split('T')[0],   // 轉換為 YYYY-MM-DD
+                            //end: event.enddate.split('T')[0],   // 轉換為 YYYY-MM-DD
+                            end: new Date(new Date(event.enddate).getTime() + 1000 * 60 * 60 * 24).toISOString().split('T')[0], 
                             color: event.color,
                             allDay: true,
                              id: event.id.toString(),  // 確保 id 是 string
@@ -64,7 +65,8 @@
                     const endDate = info.endStr;
 
                     // 修正結束時間，將結束時間減去一天，避免多顯示一天
-                    const correctedEndDate = endDate === startDate ? endDate : new Date(new Date(endDate).getTime() - 1000 * 60 * 60 * 24);
+                    //const correctedEndDate = endDate === startDate ? endDate : new Date(new Date(endDate).getTime() - 1000 * 60 * 60 * 24);
+                     const adjustedEndDate = new Date(new Date(endDate).getTime() - 1000 * 60 * 60 * 24).toISOString().split('T')[0];
 
                     Swal.fire({
                         title: '新增活動',
@@ -94,7 +96,8 @@
                                     body: JSON.stringify({
                                         InputContent: eventContent,
                                         InputStartDate: startDate,
-                                        InputEndDate: correctedEndDate,
+                                        //InputEndDate: correctedEndDate,
+                                        InputEndDate: adjustedEndDate,
                                         InputColor: color
                                     })
                                 })
@@ -131,7 +134,8 @@
                     let endDate = new Date(info.event.endStr); // 確保 endDate 是 Date 物件
                     
                     // 修正結束時間，將結束時間減去一天，避免多顯示一天
-                    const correctedEndDate = endDate.getTime() === startDate.getTime() ? endDate : new Date(endDate.getTime() - 1000 * 60 * 60 * 24);
+                    //const correctedEndDate = endDate.getTime() === startDate.getTime() ? endDate : new Date(endDate.getTime() - 1000 * 60 * 60 * 24);
+                    const correctedEndDate = new Date(endDate.getTime() - 1000 * 60 * 60 * 24);
 
                     Swal.fire({
                         title: '詳細資訊',
