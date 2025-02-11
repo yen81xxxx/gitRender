@@ -170,14 +170,7 @@
             });
 
             calendar.render();
-
-            // **手機端點擊修正 (確保 `eventClick` 事件可觸發)**
-            document.querySelectorAll('.fc-event').forEach(eventEl => {
-                eventEl.addEventListener('touchstart', function(e) {
-                    e.preventDefault(); // 防止瀏覽器觸發雙擊放大
-                    eventEl.click(); // 模擬點擊事件
-             });
-        }); // 這一行是關閉 `document.addEventListener`
+        }); 
     </script>
 
 </body>
