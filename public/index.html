@@ -39,34 +39,36 @@
                     right: ''
                 },
                 events: function(info, successCallback, failureCallback) {
-                    fetch('/events')
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('📌 從後端獲取的原始資料:', data);
-                            const events = data.map(event => ({
-                                title: event.content,
-                                start: event.startdate.split('T')[0],
-                                end: event.enddate.split('T')[0],
-                                color: event.color,
-                                allDay: true,
-                                id: event.id.toString()  // 確保 id 是 string
-                            }));
-                            successCallback(events);
-                        })
-                        .catch(error => {
-                            console.error('❌ 讀取事件時發生錯誤:', error);
-                            failureCallback(error);
-                        });
-                },
+                fetch('/events')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('📌 從後端獲取的原始資料:', data);
+                        const events = data.map(event => ({
+                            title: event.content ,
+                            start: event.startdate.split('T')[0], // 轉換為 YYYY-MM-DD
+                            end: event.enddate.split('T')[0],   // 轉換為 YYYY-MM-DD
+                            color: event.color,
+                            allDay: true,
+                             id: event.id.toString(),  // 確保 id 是 string
+                        }));
+                        successCallback(events);  // FullCalendar 只需要這個來接收事件
+                    })
+                    .catch(error => {
+                        console.error('❌ 讀取事件時發生錯誤:', error);
+                        failureCallback(error);
+                    });
+            },
                 selectable: true,
                 select: function (info) {
                     const startDate = info.startStr;
-                    const endDate = new Date(info.endStr);
-                    endDate.setDate(endDate.getDate() - 1); // 修正結束時間
+                    const endDate = info.endStr;
+
+                    // 修正結束時間，將結束時間減去一天，避免多顯示一天
+                    const correctedEndDate = endDate === startDate ? endDate : new Date(new Date(endDate).getTime() - 1000 * 60 * 60 * 24);
 
                     Swal.fire({
                         title: '新增活動',
-                        html: `您選擇的範圍：<br><strong>${startDate}</strong> 到 <strong>${endDate.toISOString().split('T')[0]}</strong>
+                        html: `您選擇的範圍：<br><strong>${startDate}</strong> 到 <strong>${correctedEndDate.toISOString().split('T')[0]}</strong>
                         <br>
                         <label>請選擇顏色：</label><br>
                         <input type="radio" id="red" name="color" value="#FFA500" checked>
@@ -92,7 +94,7 @@
                                     body: JSON.stringify({
                                         InputContent: eventContent,
                                         InputStartDate: startDate,
-                                        InputEndDate: endDate.toISOString().split('T')[0],
+                                        InputEndDate: correctedEndDate,
                                         InputColor: color
                                     })
                                 })
@@ -102,7 +104,7 @@
                                     }
                                     return response.json();
                                 })
-                                .then(() => {
+                                .then(data => {
                                     calendar.refetchEvents();
                                     return eventContent;
                                 })
@@ -123,18 +125,20 @@
                     });
                 },
                 eventClick: function (info) {
-                    console.log("✅ 點擊事件: ", info.event); // 測試點擊是否有反應
-
-                    const startDate = new Date(info.event.startStr);
-                    let endDate = new Date(info.event.endStr);
-                    endDate.setDate(endDate.getDate() - 1);
+                     console.log("Event Clicked: ", info);  // 這行確保事件被觸發
+                    
+                    const startDate = new Date(info.event.startStr); // 確保 startDate 是 Date 物件
+                    let endDate = new Date(info.event.endStr); // 確保 endDate 是 Date 物件
+                    
+                    // 修正結束時間，將結束時間減去一天，避免多顯示一天
+                    const correctedEndDate = endDate.getTime() === startDate.getTime() ? endDate : new Date(endDate.getTime() - 1000 * 60 * 60 * 24);
 
                     Swal.fire({
                         title: '詳細資訊',
                         html: `
                             <p>${info.event.title}</p>
                             <p><strong>開始日期：</strong>${startDate.toISOString().split('T')[0]}</p>
-                            <p><strong>結束日期：</strong>${endDate.toISOString().split('T')[0]}</p>
+                            <p><strong>結束日期：</strong>${correctedEndDate.toISOString().split('T')[0]}</p>
                         `,
                         icon: 'info',
                         confirmButtonText: '確定',
@@ -142,6 +146,7 @@
                         cancelButtonText: '刪除活動'
                     }).then((result) => {
                         if (result.isDismissed) {
+                            info.event.remove();
                             fetch(`/events/${info.event.id}`, {
                                 method: 'DELETE',
                             })
@@ -165,7 +170,7 @@
             });
 
             calendar.render();
-        });
+        }); 
     </script>
 
 </body>
